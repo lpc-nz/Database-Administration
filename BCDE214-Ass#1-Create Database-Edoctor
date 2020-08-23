@@ -1,0 +1,101 @@
+CREATE DATABASE EDoctor;
+USE EDoctor;
+SET STORAGE_ENGINE = InnoDB;
+
+-- Create database base on ERD diagram
+
+CREATE TABLE Account (
+accountID INT PRIMARY KEY,
+userName VARCHAR(30),
+password VARCHAR(30),
+email VARCHAR(50));
+
+CREATE TABLE Payment (
+accountID INT,
+paymentID INT,
+cardNum INT,
+cardName VARCHAR(30),
+securityCode INT,
+PRIMARY KEY (accountID, paymentID),
+FOREIGN KEY (accountID) REFERENCES Account (accountID)
+);
+
+CREATE TABLE License(
+licenseID INT PRIMARY KEY,
+about VARCHAR(500),
+education VARCHAR(100),
+experience VARCHAR(500)
+);
+
+CREATE TABLE Physician (
+physicianID INT PRIMARY KEY,
+accountID INT,
+fName VARCHAR(30),
+lName VARCHAR(30),
+licenseID INT,
+language VARCHAR(30),
+FOREIGN KEY (accountID) REFERENCES Account(accountID)
+);
+
+CREATE TABLE Patient (
+patientID INT PRIMARY KEY,
+accountID INT,
+historyID INT,
+fName VARCHAR(30),
+lName VARCHAR(30),
+streetNum INT,
+streetName VARCHAR(50),
+suburb VARCHAR(30),
+email VARCHAR(50),
+FOREIGN KEY (accountID) REFERENCES Account(accountID)
+);
+ALTER TABLE Patient
+ADD FOREIGN KEY (historyID) REFERENCES History(historyID);
+
+CREATE TABLE Bookings (
+bookingID INT,
+accountID INT,
+patientID INT,
+physicianID INT,
+time TIME,
+date DATE,
+PRIMARY KEY (bookingID, accountID),
+FOREIGN KEY (accountID) REFERENCES Account(accountID),
+FOREIGN KEY (patientID) REFERENCES Patient(patientID),
+FOREIGN KEY (physicianID) REFERENCES Physician(physicianID)
+);
+
+CREATE TABLE Bills (
+billID INT PRIMARY KEY,
+bookingID INT,
+total DECIMAL(10, 2),
+FOREIGN KEY (bookingID) REFERENCES Bookings(bookingID)
+);
+
+CREATE TABLE Treat (
+treatID INT,
+physicianID INT,
+patientID INT,
+date DATE,
+time TIME,
+description VARCHAR(500),
+PRIMARY KEY(treatID, physicianID, patientID),
+FOREIGN KEY (physicianID) REFERENCES Physician(physicianID),
+FOREIGN KEY (patientID) REFERENCES Patient(patientID)
+);
+
+CREATE TABLE History (
+historyID INT PRIMARY KEY,
+patientID INT,
+treatID INT,
+FOREIGN KEY (patientID) REFERENCES Patient(patientID),
+FOREIGN KEY (treatID) REFERENCES Treat(treatID)
+);
+
+CREATE TABLE Presciption (
+prescriptionID INT,
+treatID INT,
+prescription VARCHAR(500),
+PRIMARY KEY(prescriptionID, treatID),
+FOREIGN KEY (treatID) REFERENCES Treat(treatID)
+);
